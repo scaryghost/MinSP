@@ -1,8 +1,36 @@
 class MSPLinkedReplicationInfo extends LinkedReplicationInfo;
 
 var array<class<KFVeterancyTypes> > veterancyTypes;
+var MSPMut mut;
+var bool initialized;
 
-simulated function addVeterancyType(class<KFVeterancyTypes> type) {
+replication {
+    reliable if (Role == ROLE_Authority)
+        flushToClient;
+}
+
+simulated function Tick(float DeltaTime) {
+    super.Tick(DeltaTime);
+
+    if (!initialized && Role == ROLE_Authority) {
+        mut.sendVeterancyTypes(self);
+        initialized= true;
+    }
+}
+
+simulated function flushToClient(string vetName) {
+    veterancyTypes[veterancyTypes.Length]= class<KFVeterancyTypes>(DynamicLoadObject(vetName, class'Class'));
+}
+
+function addVeterancyType(class<KFVeterancyTypes> type, string vetName) {
+    local int i;
+
+    for(i= 0; i < veterancyTypes.Length && veterancyTypes[i] != type; i++) {
+    }
+    if (i >= veterancyTypes.Length) {
+        veterancyTypes[veterancyTypes.Length]= type;
+        flushToClient(vetName);
+    }
 }
 
 static function MSPLinkedReplicationInfo findLRI(PlayerReplicationInfo pri) {
