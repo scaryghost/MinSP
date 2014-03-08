@@ -22,11 +22,6 @@ function bool OnFooterClick(GUIComponent Sender) {
     } else if (Sender == b_Ready) {
         if (PC.PlayerReplicationInfo.Team != none) {
             if (PC.Level.NetMode == NM_Standalone || !PC.PlayerReplicationInfo.bReadyToPlay) {
-                if (KFPlayerController(PC) != none) {
-                    KFPlayerController(PC).SelectedVeterancy= mspLRepInfo.veterancyTypes[Rand(mspLRepInfo.veterancyTypes.Length)];
-                    KFPlayerController(PC).SendSelectedVeterancyToServer(true);
-                }
-
                 //Set Ready
                 PC.ServerRestartPlayer();
                 PC.PlayerReplicationInfo.bReadyToPlay = True;

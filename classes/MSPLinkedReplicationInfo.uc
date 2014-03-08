@@ -24,12 +24,16 @@ simulated function flushToClient(string vetName) {
 
 function addVeterancyType(class<KFVeterancyTypes> type, string vetName) {
     local int i;
+    local PlayerController localController;
 
+    localController= Level.GetLocalPlayerController();
     for(i= 0; i < veterancyTypes.Length && veterancyTypes[i] != type; i++) {
     }
     if (i >= veterancyTypes.Length) {
         veterancyTypes[veterancyTypes.Length]= type;
-        flushToClient(vetName);
+        if (localController == none) {
+            flushToClient(vetName);
+        }
     }
 }
 

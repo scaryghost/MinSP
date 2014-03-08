@@ -16,7 +16,7 @@ function Tick (float DeltaTime) {
         mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(ViewportOwner.Actor.PlayerReplicationInfo);
         i= Rand(mspLRepInfo.veterancyTypes.Length);
         KFPlayerController(ViewportOwner.Actor).SelectedVeterancy= mspLRepInfo.veterancyTypes[i];
-        KFPlayerController(ViewportOwner.Actor).SendSelectedVeterancyToServer(true);
+        ViewportOwner.Actor.ServerMutate("perkchange"@i);
         bRequiresTick= false;
     }
 }

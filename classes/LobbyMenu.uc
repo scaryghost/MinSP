@@ -22,7 +22,6 @@ function InitComponent(GUIController MyC, GUIComponent MyO) {
 }
 
 event Opened(GUIComponent Sender) {
-    bShouldUpdateVeterancy = true;
     SetTimer(1,true);
     VideoTimer = 0.0;
     VideoPlayed = false;
@@ -68,12 +67,6 @@ function bool InternalOnPreDraw(Canvas C) {
         WaveLabel.Caption = string(KFGRI.WaveNumber + 1) $ "/" $ string(KFGRI.FinalWave);
     } else {
         WaveLabel.Caption = "?/?";
-    }
-
-    if (KFPlayerController(PC) != none && bShouldUpdateVeterancy) {
-        KFPlayerController(PC).SelectedVeterancy= mspLRepInfo.veterancyTypes[Rand(mspLRepInfo.veterancyTypes.Length)];
-        KFPlayerController(PC).SendSelectedVeterancyToServer(true);
-        bShouldUpdateVeterancy = false;
     }
 
     // First fill in non-ready players.
@@ -282,7 +275,7 @@ function DrawPerk(Canvas Canvas) {
 
 
 defaultproperties {
-    modInfoText="MinSP||If you cannot select a perk, type in console:|'mutate perkchange $index', where index=[0,5]"
+    modInfoText="MinSP||If you cannot select a perk, type in console:|'mutate perkchange <index>'"
     profilePage="MinSP.ProfilePage"
 
     Begin Object Class=MinSP.LobbyFooter Name=Footer
