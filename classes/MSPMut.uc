@@ -3,8 +3,19 @@ class MSPMut extends Mutator
 
 var() config array<string> veterancyNames;
 
+var string interactionClass;
 var array<string> uniqueNames;
 var array<class<KFVeterancyTypes> > loadedVeterancyTypes;
+
+simulated function Tick(float DeltaTime) {
+    local PlayerController localController;
+
+    localController= Level.GetLocalPlayerController();
+    if (localController != none) {
+        localController.Player.InteractionMaster.AddInteraction(interactionClass, localController.Player);
+    }
+    Disable('Tick');
+}
 
 function PostBeginPlay() {
     local int i;
@@ -110,5 +121,10 @@ static function uniqueInsert(out array<string> list, string key) {
 defaultproperties {
     GroupName="KFMinSP"
     FriendlyName="Minimalist Server Perks"
-    Description="Minimalist enviornment for using custom perks"
+    Description="Minimalist environment for using custom perks"
+
+    interactionClass="MinSP.MSPInteraction"
+
+    RemoteRole= ROLE_SimulatedProxy
+    bAlwaysRelevant= true
 }
