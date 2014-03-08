@@ -3,7 +3,7 @@ class MSPMut extends Mutator
 
 var() config array<string> veterancyNames;
 
-var string interactionClass;
+var string interactionClass, loginMenuClass;
 var array<string> uniqueNames;
 var array<class<KFVeterancyTypes> > loadedVeterancyTypes;
 
@@ -26,6 +26,10 @@ function PostBeginPlay() {
         Destroy();
         return;
     }
+
+    AddToPackageMap();
+    DeathMatch(Level.Game).LoginMenuClass= loginMenuClass;
+
     log("Attempting to load"@veterancyNames.Length@"veterancy names");
     for(i= 0; i < veterancyNames.Length; i++) {
         uniqueInsert(uniqueNames, veterancyNames[i]);
@@ -124,6 +128,7 @@ defaultproperties {
     Description="Minimalist environment for using custom perks"
 
     interactionClass="MinSP.MSPInteraction"
+    loginMenuClass="MinSP.InvasionLoginMenu"
 
     RemoteRole= ROLE_SimulatedProxy
     bAlwaysRelevant= true
