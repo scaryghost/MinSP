@@ -1,5 +1,7 @@
 class MSPLinkedReplicationInfo extends LinkedReplicationInfo;
 
+var string interactionClass;
+var KFPlayerController ownerController;
 var localized string perkChangeTraderMsg;
 var array<class<KFVeterancyTypes> > veterancyTypes;
 var MSPMut mut;
@@ -7,17 +9,25 @@ var bool initialized;
 var int desiredPerkLevel;
 
 replication {
-    reliable if (Role != ROLE_Authority)
+    reliable if (Role < ROLE_Authority)
        sendPerkToServer;
     reliable if (Role == ROLE_Authority)
         flushToClient, desiredPerkLevel;
 }
 
 simulated function Tick(float DeltaTime) {
+    local PlayerController localController;
+
     super.Tick(DeltaTime);
 
-    if (!initialized && Role == ROLE_Authority) {
-        mut.sendVeterancyTypes(self);
+    if (!initialized) {
+        if (Role == ROLE_Authority) {
+            mut.sendVeterancyTypes(self);
+        }
+        localController= Level.GetLocalPlayerController();
+        if (localController != none) {
+            localController.Player.InteractionMaster.AddInteraction(interactionClass, localController.Player);
+        }
         initialized= true;
     }
 }
@@ -41,7 +51,7 @@ function addVeterancyType(class<KFVeterancyTypes> type, string vetName) {
     }
 }
 
-simulated function sendPerkToServer(class<KFVeterancyTypes> perk, int level) {
+function sendPerkToServer(class<KFVeterancyTypes> perk, int level) {
     local KFPlayerController kfPC;
     local KFPlayerReplicationInfo kfRepInfo;
 
@@ -73,15 +83,12 @@ simulated function sendPerkToServer(class<KFVeterancyTypes> perk, int level) {
     }
 }
 
-function changePerk(int perkIndex) {
-    local KFPlayerController kfPC;
-
-    kfPC= KFPlayerController(Owner);
-    kfPC.SelectedVeterancy= veterancyTypes[perkIndex];
-    sendPerkToServer(kfPC.SelectedVeterancy, desiredPerkLevel);
+simulated function changePerk(int perkIndex) {
+    ownerController.SelectedVeterancy= veterancyTypes[perkIndex];
+    sendPerkToServer(ownerController.SelectedVeterancy, desiredPerkLevel);
 }
 
-function changeRandomPerk() {
+simulated function changeRandomPerk() {
     changePerk(Rand(veterancyTypes.Length));
 }
 
@@ -101,6 +108,8 @@ static function MSPLinkedReplicationInfo findLRI(PlayerReplicationInfo pri) {
 }
 
 defaultproperties {
+    interactionClass="MinSP.MSPInteraction"
+
     desiredPerkLevel=6
     perkChangeTraderMsg="You can only change perks during trader time"
 }

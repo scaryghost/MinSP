@@ -18,6 +18,7 @@ function Tick (float DeltaTime) {
         KFPlayerController(ViewportOwner.Actor).ShowLobbyMenu();
 
         mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(ViewportOwner.Actor.PlayerReplicationInfo);
+        mspLRepInfo.ownerController= KFPlayerController(ViewportOwner.Actor);
         mspLRepInfo.changeRandomPerk();
         bRequiresTick= false;
     }
