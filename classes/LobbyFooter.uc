@@ -1,14 +1,7 @@
 class LobbyFooter extends KFGui.LobbyFooter;
 
-var MSPLinkedReplicationInfo mspLRepInfo;
-
-function bool InternalOnPreDraw(Canvas C) {
-    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
-
-    return super.InternalOnPreDraw(C);
-}
-
 function bool OnFooterClick(GUIComponent Sender) {
+    local MSPLinkedReplicationInfo mspLRepInfo;
     local GUIController C;
     local PlayerController PC;
 
@@ -22,6 +15,11 @@ function bool OnFooterClick(GUIComponent Sender) {
     } else if (Sender == b_Ready) {
         if (PC.PlayerReplicationInfo.Team != none) {
             if (PC.Level.NetMode == NM_Standalone || !PC.PlayerReplicationInfo.bReadyToPlay) {
+                if (KFPlayerController(PC) != none) {
+                    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PC.PlayerReplicationInfo);
+                    mspLRepInfo.sendPerkToServer(KFPlayerController(PC).SelectedVeterancy, mspLRepInfo.desiredPerkLevel);
+                }
+
                 //Set Ready
                 PC.ServerRestartPlayer();
                 PC.PlayerReplicationInfo.bReadyToPlay = True;

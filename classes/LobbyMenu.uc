@@ -22,6 +22,7 @@ function InitComponent(GUIController MyC, GUIComponent MyO) {
 }
 
 event Opened(GUIComponent Sender) {
+    bShouldUpdateVeterancy = true;
     SetTimer(1,true);
     VideoTimer = 0.0;
     VideoPlayed = false;

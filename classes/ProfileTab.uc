@@ -1,6 +1,17 @@
 class ProfileTab extends KFTab_Profile;
 
 var MSPLinkedReplicationInfo mspLRepInfo;
+var automated moNumericEdit perkLevelsEdit;
+var bool saveButtonPressed;
+
+function InitComponent(GUIController MyController, GUIComponent MyOwner) {
+    super.InitComponent(MyController, MyOwner);
+    
+    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
+    perkLevelsEdit.Setup(0, 6, 1);
+    i_BGPerkNextLevel.UnManageComponent(lb_PerkProgress);
+    i_BGPerkNextLevel.ManageComponent(perkLevelsEdit);
+}
 
 function ShowPanel(bool bShow) {
     if (bShow) {
@@ -10,7 +21,7 @@ function ShowPanel(bool bShow) {
         }
 
         lb_PerkSelect.List.InitList(KFStatsAndAchievements);
-        lb_PerkProgress.List.InitList();
+        perkLevelsEdit.SetValue(mspLRepInfo.desiredPerkLevel);
     }
 
     lb_PerkSelect.SetPosition(i_BGPerks.WinLeft + 6.0 / float(Controller.ResX),
@@ -19,7 +30,6 @@ function ShowPanel(bool bShow) {
                               i_BGPerks.WinHeight - 35.0 / float(Controller.ResY),
                               true);
     SetVisibility(bShow);
-    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
 }
 
 function SaveSettings() {
@@ -44,15 +54,23 @@ function SaveSettings() {
     }
 
 
-    mspLRepInfo.changePerk(lb_PerkSelect.GetIndex());
+    if (saveButtonPressed) {
+        mspLRepInfo.desiredPerkLevel= perkLevelsEdit.GetValue();
+        mspLRepInfo.changePerk(lb_PerkSelect.GetIndex());
+        saveButtonPressed= false;
+    }
 }
 
 function OnPerkSelected(GUIComponent Sender) {
-    lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()].default.LevelEffects[KFPlayerReplicationInfo(PlayerOwner().PlayerReplicationInfo).ClientVeteranSkillLevel]);
-    lb_PerkProgress.List.PerkChanged(KFStatsAndAchievements, lb_PerkSelect.GetIndex());
+    lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()].default.LevelEffects[perkLevelsEdit.GetValue()]);
+    if (Sender == perkLevelsEdit) {
+        PerkSelectList(lb_PerkSelect.List).updateLevelStrings(perkLevelsEdit.GetValue());
+    }
 }
 
 defaultproperties {
+    lb_PerkProgress=None
+
     Begin Object Class=KFPerkSelectListBox Name=PerkSelectBox
         OnCreateComponent=PerkSelectBox.InternalOnCreateComponent
         WinTop=0.082969
@@ -63,13 +81,21 @@ defaultproperties {
     End Object
     lb_PerkSelect=PerkSelectBox
 
-    Begin Object Class=KFPerkProgressListBox Name=PerkProgressBox
-        OnCreateComponent=PerkProgressBox.InternalOnCreateComponent
-        WinTop=0.439668
-        WinLeft=0.670121
-        WinWidth=0.319980
-        WinHeight=0.292235
-        DefaultListClass="MinSP.PerkProgressList"
+    Begin Object Class=GUISectionBackground Name=PerkConfig
+        bFillClient=True
+        Caption="Perk Configuration"
+        WinTop=0.379668
+        WinLeft=0.660121
+        WinWidth=0.339980
+        WinHeight=0.352235
+        OnPreDraw=PerkConfig.InternalPreDraw
     End Object
-    lb_PerkProgress=PerkProgressBox
+    i_BGPerkNextLevel=PerkConfig
+
+    Begin Object class=moNumericEdit Name=PerkLevelsBox
+        Caption="Perk Level"
+        Hint="Set perk level"
+        OnChange=ProfileTab.OnPerkSelected
+    End Object
+    perkLevelsEdit=PerkLevelsBox
 }
