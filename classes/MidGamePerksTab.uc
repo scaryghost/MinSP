@@ -18,6 +18,7 @@ function ShowPanel(bool bShow) {
 
     if (bShow && PlayerOwner() != none) {
         lb_PerkSelect.List.InitList(KFStatsAndAchievements);
+        perkLevelsEdit.SetValue(mspLRepInfo.desiredPerkLevel);
         InitGRI();
     }
 }
