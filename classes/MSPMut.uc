@@ -2,9 +2,7 @@ class MSPMut extends Mutator
     config(MinSP);
 
 var() config array<string> veterancyNames;
-var() config int perkLevel;
 
-var localized string perkChangeTraderMsg;
 var string interactionClass, loginMenuClass;
 var array<string> uniqueNames;
 var array<class<KFVeterancyTypes> > loadedVeterancyTypes;
@@ -40,7 +38,7 @@ function PostBeginPlay() {
     while(i < uniqueNames.Length) {
         loadedVetType= class<KFVeterancyTypes>(DynamicLoadObject(uniqueNames[i], class'Class'));
         if (loadedVetType == none) {
-            Warn("Failed to load achievement pack"@uniqueNames[i]);
+            Warn("Failed to load perk"@uniqueNames[i]);
             uniqueNames.remove(i, 1);
         } else {
             log("Successfully loaded"@uniqueNames[i]);
@@ -57,46 +55,6 @@ function PostBeginPlay() {
     
 }
 
-function Mutate(string Command, PlayerController Sender) {
-    local KFPlayerController kfPC;
-    local KFPlayerReplicationInfo kfRepInfo;
-    local array<string> parts;
-    local int index;
-    Split(Command, " ", parts);
-
-    kfPC= KFPlayerController(Sender);
-    kfRepInfo= KFPlayerReplicationInfo(kfPC.PlayerReplicationInfo);
-    if (kfPC != none && kfRepInfo != none && parts.Length >= 2 && parts[0] ~= "perkchange") {
-        index= int(parts[1]);
-        if (index < 0 || index > loadedVeterancyTypes.Length) {
-            Sender.ClientMessage("Usage: mutate perkchange [0-" $ loadedVeterancyTypes.Length $ "]");
-        } else {
-            kfPC.SelectedVeterancy= loadedVeterancyTypes[index];
-
-            if (KFGameReplicationInfo(Level.GRI).bWaveInProgress && kfPC.SelectedVeterancy != kfRepInfo.ClientVeteranSkill) {
-                Sender.ClientMessage(perkChangeTraderMsg);
-            } else if (!kfPC.bChangedVeterancyThisWave) {
-                if (kfPC.SelectedVeterancy != kfRepInfo.ClientVeteranSkill) {
-                    Sender.ClientMessage(Repl(kfPC.YouAreNowPerkString, "%Perk%", kfPC.SelectedVeterancy.Default.VeterancyName));
-                }
-                if (Level.GRI.bMatchHasBegun) {
-                    kfPC.bChangedVeterancyThisWave = true;
-                }
-
-                kfRepInfo.ClientVeteranSkill = kfPC.SelectedVeterancy;
-                kfRepInfo.ClientVeteranSkillLevel= perkLevel;
-
-                if( KFHumanPawn(kfPC.Pawn) != none ) {
-                    KFHumanPawn(kfPC.Pawn).VeterancyChanged();
-                }    
-            } else {
-                Sender.ClientMessage(kfPC.PerkChangeOncePerWaveString);
-            }
-        }
-    }    
-    super.Mutate(Command, Sender);
-}
-
 function bool CheckReplacement(Actor Other, out byte bSuperRelevant) {
     local KFPlayerReplicationInfo kfPRepInfo;
     local MSPLinkedReplicationInfo mspLRepInfo;
@@ -107,7 +65,7 @@ function bool CheckReplacement(Actor Other, out byte bSuperRelevant) {
         mspLRepInfo.mut= Self;
         mspLRepInfo.NextReplicationInfo= kfPRepInfo.CustomReplicationInfo;
         kfPRepInfo.CustomReplicationInfo= mspLRepInfo;
-        kfPRepInfo.ClientVeteranSkillLevel= perkLevel;
+        kfPRepInfo.ClientVeteranSkillLevel= mspLRepInfo.desiredPerkLevel;
     }
 
     return super.CheckReplacement(Other, bSuperRelevant);
@@ -124,7 +82,6 @@ function sendVeterancyTypes(MSPLinkedReplicationInfo mspLRepInfo) {
 static function FillPlayInfo(PlayInfo PlayInfo) {
     Super.FillPlayInfo(PlayInfo);
     PlayInfo.AddSetting("MinSP", "veterancyNames", "Veterancy Names", 1, 1, "Text", "128",,,);
-    PlayInfo.AddSetting("MinSP", "perkLevel", "Perk Level", 1, 1, "Text", "0.1;0:6");
 }
 
 static event string GetDescriptionText(string property) {
@@ -173,7 +130,6 @@ defaultproperties {
 
     interactionClass="MinSP.MSPInteraction"
     loginMenuClass="MinSP.InvasionLoginMenu"
-    perkChangeTraderMsg="You can only change perks during trader time"
 
     RemoteRole= ROLE_SimulatedProxy
     bAlwaysRelevant= true

@@ -44,8 +44,7 @@ function SaveSettings() {
     }
 
 
-    KFPlayerController(PC).SelectedVeterancy = mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()];
-    PC.ServerMutate("perkchange"@lb_PerkSelect.GetIndex());
+    mspLRepInfo.changePerk(lb_PerkSelect.GetIndex());
 }
 
 function OnPerkSelected(GUIComponent Sender) {

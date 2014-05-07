@@ -17,8 +17,7 @@ function bool OnSaveButtonClicked(GUIComponent Sender) {
     local PlayerController PC;
 
     PC = PlayerOwner();
-    KFPlayerController(PC).SelectedVeterancy= mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()];
-    PC.ServerMutate("perkchange"@lb_PerkSelect.GetIndex());
+    mspLRepInfo.changePerk(lb_PerkSelect.GetIndex());
     return true;
 }
 

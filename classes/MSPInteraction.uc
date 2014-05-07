@@ -5,7 +5,6 @@ var MSPLinkedReplicationInfo mspLRepInfo;
 
 function Tick (float DeltaTime) {
     local KFGUIController guiController;
-    local int i;
 
     guiController= KFGUIController(ViewportOwner.GUIController);
     if (guiController != none && guiController.ActivePage != none && guiController.ActivePage.class == class'KFGui.LobbyMenu') {
@@ -14,9 +13,7 @@ function Tick (float DeltaTime) {
         KFPlayerController(ViewportOwner.Actor).ShowLobbyMenu();
 
         mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(ViewportOwner.Actor.PlayerReplicationInfo);
-        i= Rand(mspLRepInfo.veterancyTypes.Length);
-        KFPlayerController(ViewportOwner.Actor).SelectedVeterancy= mspLRepInfo.veterancyTypes[i];
-        ViewportOwner.Actor.ServerMutate("perkchange"@i);
+        mspLRepInfo.changeRandomPerk();
         bRequiresTick= false;
     }
 }
