@@ -1,17 +1,18 @@
 class MSPInteraction extends Interaction;
 
 var string buyMenuClass, lobbyMenuClass;
-var MSPLinkedReplicationInfo mspLRepInfo;
 
 event NotifyLevelChange() {
     Master.RemoveInteraction(self);
 }
 
 function Tick (float DeltaTime) {
+    local MSPLinkedReplicationInfo mspLRepInfo;
     local KFGUIController guiController;
 
     guiController= KFGUIController(ViewportOwner.GUIController);
-    if (guiController != none && guiController.ActivePage != none && guiController.ActivePage.class == class'KFGui.LobbyMenu') {
+    if (guiController != none && guiController.ActivePage != none && 
+            ClassIsChildOf(guiController.ActivePage.class, class'KFGui.LobbyMenu')) {
         KFPlayerController(ViewportOwner.Actor).LobbyMenuClassString= lobbyMenuClass;
         ViewportOwner.Actor.ClientCloseMenu(true, true);
         KFPlayerController(ViewportOwner.Actor).ShowLobbyMenu();
@@ -34,7 +35,8 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
             break;
         }
         if (touchingShopVolume && Len(buyMenuClass) > 0) {
-            ViewportOwner.Actor.ClientOpenMenu(buyMenuClass,,"MyTrader", string(KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight));
+            ViewportOwner.Actor.ClientOpenMenu(buyMenuClass,,"MyTrader", 
+                string(KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight));
             return true;
         }
     }
