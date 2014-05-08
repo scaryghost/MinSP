@@ -78,6 +78,10 @@ function bool InternalOnPreDraw(Canvas C) {
         WaveLabel.Caption= "";
         WaveLabel.DisableMe();
     }
+    if (KFPlayerController(PC) != none && bShouldUpdateVeterancy) {
+        mspLRepInfo.changeRandomPerk();
+        bShouldUpdateVeterancy = false;
+    }
 
     // First fill in non-ready players.
     if (KFGRI != none) {

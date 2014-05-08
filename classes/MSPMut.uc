@@ -66,6 +66,7 @@ function bool CheckReplacement(Actor Other, out byte bSuperRelevant) {
         mspLRepInfo.NextReplicationInfo= kfPRepInfo.CustomReplicationInfo;
         mspLRepInfo.minPerkLevel= minPerkLevel;
         mspLRepInfo.maxPerkLevel= maxPerkLevel;
+        mspLRepInfo.desiredPerkLevel= maxPerkLevel;
         kfPRepInfo.CustomReplicationInfo= mspLRepInfo;
         kfPRepInfo.ClientVeteranSkillLevel= mspLRepInfo.desiredPerkLevel;
     }
