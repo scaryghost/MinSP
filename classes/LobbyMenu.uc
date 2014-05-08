@@ -1,4 +1,4 @@
-class LobbyMenu extends KFGui.LobbyMenu;
+class LobbyMenu extends LobbyMenu_Story;
 
 var MSPLinkedReplicationInfo mspLRepInfo;
 var localized string modInfoText;
@@ -19,6 +19,8 @@ function InitComponent(GUIController MyC, GUIComponent MyO) {
     i_Portrait.WinTop= PlayerPortraitBG.ActualTop() + 30;
     i_Portrait.WinHeight= PlayerPortraitBG.ActualHeight() - 36;
     t_ChatBox.FocusInstead= PerkClickLabel;
+    
+    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
 }
 
 event Opened(GUIComponent Sender) {
@@ -28,7 +30,13 @@ event Opened(GUIComponent Sender) {
     VideoPlayed = false;
     VideoOpened = false;
 
-    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
+    if (PlayerOwner().GameReplicationInfo.IsA('KF_StoryGRI')) {
+        WaveBG.Image= None;
+        WaveBG.DisableMe();
+    } else {
+        WaveBG.Image= Texture'KillingFloorHUD.HUD.Hud_Bio_Circle';
+        WaveLabel.EnableMe();
+    }
 }
 
 function bool ShowPerkMenu(GUIComponent Sender) {
@@ -64,10 +72,11 @@ function bool InternalOnPreDraw(Canvas C) {
     t_Footer.InternalOnPreDraw(C);
     WaveLabel.WinWidth = WaveLabel.ActualHeight();
     KFGRI = KFGameReplicationInfo(PC.GameReplicationInfo);
-    if (KFGRI != none) {
+    if (KFGRI != None && !KFGRI.IsA('KF_StoryGRI')) {
         WaveLabel.Caption = string(KFGRI.WaveNumber + 1) $ "/" $ string(KFGRI.FinalWave);
     } else {
-        WaveLabel.Caption = "?/?";
+        WaveLabel.Caption= "";
+        WaveLabel.DisableMe();
     }
 
     // First fill in non-ready players.
@@ -174,6 +183,7 @@ DoneIt:
 
     return false;
 }
+
 
 function DrawPerk(Canvas Canvas) {
     local float X, Y, Width, Height;
@@ -299,4 +309,30 @@ defaultproperties {
         StyleName="NoBackground"
     End Object
     modInfoTextBox=ModInfo
+
+    Begin Object Class=GUIImage Name=WaveB
+        Image=Texture'KillingFloorHUD.HUD.Hud_Bio_Circle'
+        ImageStyle=ISTY_Justified
+        ImageRenderStyle=MSTY_Normal
+        WinTop=0.043810
+        WinLeft=0.923238
+        WinWidth=0.051642
+        WinHeight=0.061783
+        RenderWeight=0.800000
+    End Object
+    WaveBG=GUIImage'KFGui.LobbyMenu.WaveB'
+
+    Begin Object Class=GUILabel Name=WaveL
+        Caption="1/4"
+        TextAlign=TXTA_Center
+        TextColor=(B=158,G=176,R=175)
+        VertAlign=TXTA_Center
+        FontScale=FNS_Small
+        WinTop=0.043810
+        WinLeft=0.923238
+        WinWidth=0.051642
+        WinHeight=0.061783
+        RenderWeight=0.900000
+    End Object
+    WaveLabel=GUILabel'KFGui.LobbyMenu.WaveL'
 }
