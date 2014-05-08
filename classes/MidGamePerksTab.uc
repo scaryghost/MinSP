@@ -6,9 +6,6 @@ var automated moNumericEdit perkLevelsEdit;
 function InitComponent(GUIController MyController, GUIComponent MyOwner) {
     super.InitComponent(MyController, MyOwner);
 
-    
-    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
-    perkLevelsEdit.Setup(0, 6, 1);
     i_BGPerkNextLevel.UnManageComponent(lb_PerkProgress);
     i_BGPerkNextLevel.ManageComponent(perkLevelsEdit);
 }
@@ -17,7 +14,10 @@ function ShowPanel(bool bShow) {
     super.ShowPanel(bShow);
 
     if (bShow && PlayerOwner() != none) {
+        mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
+
         lb_PerkSelect.List.InitList(KFStatsAndAchievements);
+        perkLevelsEdit.Setup(mspLRepInfo.minPerkLevel, mspLRepInfo.maxPerkLevel, 1);
         perkLevelsEdit.SetValue(mspLRepInfo.desiredPerkLevel);
         InitGRI();
     }
@@ -30,7 +30,8 @@ function bool OnSaveButtonClicked(GUIComponent Sender) {
 }
 
 function OnPerkSelected(GUIComponent Sender) {
-    lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()].default.LevelEffects[perkLevelsEdit.GetValue()]);
+    lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()]
+            .default.LevelEffects[perkLevelsEdit.GetValue()]);
     if (Sender == perkLevelsEdit) {
         PerkSelectList(lb_PerkSelect.List).updateLevelStrings(perkLevelsEdit.GetValue());
     }

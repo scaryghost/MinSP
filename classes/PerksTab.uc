@@ -13,6 +13,9 @@ function ShowPanel(bool bShow) {
 
             // Initialize the List
             lb_PerkSelect.List.InitList(KFStatsAndAchievements);
+
+            mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
+            perkLevels.Setup(mspLRepInfo.minPerkLevel, mspLRepInfo.maxPerkLevel, 1);
             perkLevels.SetValue(mspLRepInfo.desiredPerkLevel);
         }
 
@@ -23,15 +26,14 @@ function ShowPanel(bool bShow) {
 function InitComponent(GUIController MyController, GUIComponent MyOwner) {
     Super.InitComponent(MyController, MyOwner);
     
-    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
-    perkLevels.Setup(0, 6, 1);
     i_BGPerkNextLevel.UnManageComponent(lb_PerkProgress);
     i_BGPerkNextLevel.ManageComponent(perkLevels);
 
 }
 
 function OnPerkSelected(GUIComponent Sender) {
-    lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()].default.LevelEffects[perkLevels.GetValue()]);
+    lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()]
+            .default.LevelEffects[perkLevels.GetValue()]);
     if (Sender == perkLevels) {
         PerkSelectList(lb_PerkSelect.List).updateLevelStrings(perkLevels.GetValue());
     }

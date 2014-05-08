@@ -7,8 +7,6 @@ var bool saveButtonPressed;
 function InitComponent(GUIController MyController, GUIComponent MyOwner) {
     super.InitComponent(MyController, MyOwner);
     
-    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
-    perkLevelsEdit.Setup(0, 6, 1);
     i_BGPerkNextLevel.UnManageComponent(lb_PerkProgress);
     i_BGPerkNextLevel.ManageComponent(perkLevelsEdit);
 }
@@ -21,6 +19,8 @@ function ShowPanel(bool bShow) {
         }
 
         lb_PerkSelect.List.InitList(KFStatsAndAchievements);
+        mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
+        perkLevelsEdit.Setup(mspLRepInfo.minPerkLevel, mspLRepInfo.maxPerkLevel, 1);
         perkLevelsEdit.SetValue(mspLRepInfo.desiredPerkLevel);
     }
 

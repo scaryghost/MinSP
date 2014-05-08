@@ -6,13 +6,13 @@ var localized string perkChangeTraderMsg;
 var array<class<KFVeterancyTypes> > veterancyTypes;
 var MSPMut mut;
 var bool initialized;
-var int desiredPerkLevel;
+var int desiredPerkLevel, minPerkLevel, maxPerkLevel;
 
 replication {
     reliable if (Role < ROLE_Authority)
        sendPerkToServer;
     reliable if (Role == ROLE_Authority)
-        flushToClient, desiredPerkLevel;
+        flushToClient, desiredPerkLevel, minPerkLevel, maxPerkLevel;
 }
 
 simulated function Tick(float DeltaTime) {
@@ -110,6 +110,5 @@ static function MSPLinkedReplicationInfo findLRI(PlayerReplicationInfo pri) {
 defaultproperties {
     interactionClass="MinSP.MSPInteraction"
 
-    desiredPerkLevel=6
     perkChangeTraderMsg="You can only change perks during trader time"
 }

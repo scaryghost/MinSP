@@ -2,7 +2,9 @@ class MSPMut extends Mutator
     config(MinSP);
 
 var() config array<string> veterancyNames;
+var() config int minPerkLevel, maxPerkLevel;
 
+var int levelUpperBound, levelLowerBound;
 var string loginMenuClass;
 var array<string> uniqueNames;
 var array<class<KFVeterancyTypes> > loadedVeterancyTypes;
@@ -17,13 +19,21 @@ function PostBeginPlay() {
         return;
     }
 
+    if (minPerkLevel > maxPerkLevel || minPerkLevel < levelLowerBound) {
+        Warn("MSPMut: minPerkLevel set to invalid level.  Defaulting to "$levelLowerBound);
+        minPerkLevel= levelLowerBound;
+    } else if (maxPerkLevel > levelUpperBound) {
+        Warn("MSPMut: maxPerkLevel set to invalid level.  Defaulting to "$levelUpperBound);
+        maxPerkLevel= levelUpperBound;
+    }
+
     AddToPackageMap();
     DeathMatch(Level.Game).LoginMenuClass= loginMenuClass;
 
-    log("Attempting to load"@veterancyNames.Length@"veterancy names");
     for(i= 0; i < veterancyNames.Length; i++) {
         uniqueInsert(uniqueNames, veterancyNames[i]);
     }
+    log("Attempting to load"@uniqueNames.Length@"veterancy names");
     i= 0;
     while(i < uniqueNames.Length) {
         loadedVetType= class<KFVeterancyTypes>(DynamicLoadObject(uniqueNames[i], class'Class'));
@@ -54,6 +64,8 @@ function bool CheckReplacement(Actor Other, out byte bSuperRelevant) {
         mspLRepInfo= kfPRepInfo.Spawn(class'MSPLinkedReplicationInfo', kfPRepInfo.Owner);
         mspLRepInfo.mut= Self;
         mspLRepInfo.NextReplicationInfo= kfPRepInfo.CustomReplicationInfo;
+        mspLRepInfo.minPerkLevel= minPerkLevel;
+        mspLRepInfo.maxPerkLevel= maxPerkLevel;
         kfPRepInfo.CustomReplicationInfo= mspLRepInfo;
         kfPRepInfo.ClientVeteranSkillLevel= mspLRepInfo.desiredPerkLevel;
     }
@@ -71,13 +83,19 @@ function sendVeterancyTypes(MSPLinkedReplicationInfo mspLRepInfo) {
 
 static function FillPlayInfo(PlayInfo PlayInfo) {
     Super.FillPlayInfo(PlayInfo);
-    PlayInfo.AddSetting("MinSP", "veterancyNames", "Veterancy Names", 1, 1, "Text", "128",,,);
+    PlayInfo.AddSetting(default.GroupName, "veterancyNames", "Veterancy Names", 1, 1, "Text", "128",,,);
+    PlayInfo.AddSetting(default.GroupName, "minPerkLevel", "Minimum Perk Level", 1, 1, "Text", "0.1;0:6");
+    PlayInfo.AddSetting(default.GroupName, "maxPerkLevel", "Maximum Perk Level", 1, 1, "Text", "0.1;0:6");
 }
 
 static event string GetDescriptionText(string property) {
     switch(property) {
         case "veterancyNames":
-            return "Names of the veterancy types(perks) to use.  Must be in full `<package>.<classname>` format";
+            return "Classnames of the perks to use in full `<package>.<classname>` format";
+        case "minPerkLevel":
+            return "Lowest allowed perk level";
+        case "maxPerkLevel":
+            return "Highest allowed perk level";
         default:
             return super.GetDescriptionText(property);
     }
@@ -119,4 +137,9 @@ defaultproperties {
     Description="Minimalist environment for using custom perks"
 
     loginMenuClass="MinSP.InvasionLoginMenu"
+
+    maxPerkLevel=6
+    minPerkLevel=0
+    levelUpperBound=6 
+    levelLowerBound=0
 }
