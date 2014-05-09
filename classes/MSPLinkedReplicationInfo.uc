@@ -23,6 +23,8 @@ simulated function Tick(float DeltaTime) {
     if (!initialized) {
         if (Role == ROLE_Authority) {
             mut.sendVeterancyTypes(self);
+            PlayerController(Owner).SteamStatsAndAchievements.Destroy();
+            PlayerController(Owner).SteamStatsAndAchievements= spawn(class'MinsP.MSPSteamStats', Owner);
         }
         localController= Level.GetLocalPlayerController();
         if (localController != none) {
