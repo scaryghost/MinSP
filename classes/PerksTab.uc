@@ -48,7 +48,8 @@ function bool OnSaveButtonClicked(GUIComponent Sender) {
         l_ChangePerkOncePerWave.SetVisibility(true);
     } else {
         mspLRepInfo.desiredPerkLevel= perkLevels.GetValue();
-        perksBox.SetIndex(lb_PerkSelect.GetIndex());
+        mspLRepInfo.changePerk(lb_PerkSelect.GetIndex());
+        perksBox.DisableMe();
         perksBox.Edit.SetText(KFPlayerController(PC).SelectedVeterancy.default.VeterancyName);
         PerksBox.Edit.SetFocus(None);
     }
