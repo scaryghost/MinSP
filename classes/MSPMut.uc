@@ -75,6 +75,26 @@ function bool CheckReplacement(Actor Other, out byte bSuperRelevant) {
     return super.CheckReplacement(Other, bSuperRelevant);
 }
 
+function GetServerDetails(out GameInfo.ServerResponseLine ServerState) {
+   // append the mutator name.
+    local int i, j;
+
+    super.GetServerDetails(ServerState);
+
+    i= ServerState.ServerInfo.Length;
+    ServerState.ServerInfo.Length= i + loadedVeterancyTypes.Length + 2;
+    for(j= 0; j < loadedVeterancyTypes.Length; j++) {
+        ServerState.ServerInfo[i].Key= "MinSP.perk";
+        ServerState.ServerInfo[i].Value= String(loadedVeterancyTypes[j].name);
+        i++;
+    }
+    ServerState.ServerInfo[i].Key= "MinSP.minPerkLevel";
+    ServerState.ServerInfo[i].Value= String(minPerkLevel);
+    ServerState.ServerInfo[i + 1].Key= "MinSP.maxPerkLevel";
+    ServerState.ServerInfo[i + 1].Value= String(maxPerkLevel);
+}
+
+
 function sendVeterancyTypes(MSPLinkedReplicationInfo mspLRepInfo) {
     local int j;
 
