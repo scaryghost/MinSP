@@ -1,7 +1,7 @@
 class LobbyMenu extends LobbyMenu_Story;
 
 var MSPLinkedReplicationInfo mspLRepInfo;
-var localized string modInfoText;
+var localized string modInfoText, maxPerkMsg, minPerkMsg, numPerksMsg;
 var bool drawn;
 var string profilePage;
 var automated GUIScrollTextBox modInfoTextBox;
@@ -191,7 +191,7 @@ DoneIt:
 
 function DrawPerk(Canvas Canvas) {
     local float X, Y, Width, Height;
-    local int CurIndex, LevelIndex;
+    local int LevelIndex;
     local float TempX, TempY;
     local float TempWidth, TempHeight;
     local float IconSize, ProgressBarWidth, PerkProgress;
@@ -207,9 +207,12 @@ function DrawPerk(Canvas Canvas) {
         modInfoTextBox.WinHeight = ADBackground.WinHeight-Y*1.25f;
         modInfoTextBox.WinLeft = ADBackground.WinLeft+X;
         modInfoTextBox.WinTop = ADBackground.WinTop+Y;
-        for(CurIndex= 0; CurIndex < mspLRepInfo.veterancyTypes.Length; CurIndex++) {
-            modInfoText$= "|" $ CurIndex $ "- " $ mspLRepInfo.veterancyTypes[CurIndex].default.VeterancyName;
-        }
+
+        modInfoText$= " v" $ class'MSPMut'.default.version $ "|";
+        modInfoText$= "|" $ maxPerkMsg $ ":  " $ mspLRepInfo.minPerkLevel;
+        modInfoText$= "|" $ minPerkMsg $ ":  " $ mspLRepInfo.maxPerkLevel;
+        modInfoText$= "|" $ numPerksMsg $ ": " $ mspLRepInfo.veterancyTypes.Length;
+
         modInfoTextBox.SetContent(modInfoText);
         drawn= true;
     }
@@ -290,7 +293,10 @@ function DrawPerk(Canvas Canvas) {
 
 
 defaultproperties {
-    modInfoText="MinSP||If you cannot select a perk, type in console:|'mutate perkchange <index>'"
+    maxPerkMsg="Min perk level"
+    minPerkMsg="Max perk level"
+    numPerksMsg="Number of perks"
+    modInfoText="MinSP"
     profilePage="MinSP.ProfilePage"
 
     Begin Object Class=MinSP.LobbyFooter Name=Footer

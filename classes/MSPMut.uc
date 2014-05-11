@@ -8,6 +8,7 @@ var int levelUpperBound, levelLowerBound;
 var string loginMenuClass;
 var array<string> uniqueNames;
 var array<class<KFVeterancyTypes> > loadedVeterancyTypes;
+var String version;
 
 function PostBeginPlay() {
     local int i;
@@ -135,7 +136,8 @@ static function uniqueInsert(out array<string> list, string key) {
 defaultproperties {
     GroupName="KFMinSP"
     FriendlyName="Minimalist Server Perks"
-    Description="Minimalist environment for using custom perks"
+    Description="Minimalist environment for using custom perks.  Version 1.0.0"
+    version="1.0.0"
 
     loginMenuClass="MinSP.InvasionLoginMenu"
 
