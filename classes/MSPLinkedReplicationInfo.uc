@@ -2,7 +2,6 @@ class MSPLinkedReplicationInfo extends LinkedReplicationInfo;
 
 var string interactionClass;
 var KFPlayerController ownerController;
-var localized string perkChangeTraderMsg;
 var array<class<KFVeterancyTypes> > veterancyTypes;
 var MSPMut mut;
 var bool initialized;
@@ -63,7 +62,7 @@ function sendPerkToServer(class<KFVeterancyTypes> perk, int level) {
         kfPC.SelectedVeterancy= perk;
 
         if (KFGameReplicationInfo(kfPC.GameReplicationInfo).bWaveInProgress && kfPC.SelectedVeterancy != kfRepInfo.ClientVeteranSkill) {
-            kfPC.ClientMessage(perkChangeTraderMsg);
+            kfPC.ClientMessage(Repl(kfPC.YouWillBecomePerkString, "%Perk%", perk.default.VeterancyName));
         } else if (!kfPC.bChangedVeterancyThisWave) {
             if (kfPC.SelectedVeterancy != kfRepInfo.ClientVeteranSkill) {
                 kfPC.ClientMessage(Repl(kfPC.YouAreNowPerkString, "%Perk%", kfPC.SelectedVeterancy.Default.VeterancyName));
@@ -111,6 +110,4 @@ static function MSPLinkedReplicationInfo findLRI(PlayerReplicationInfo pri) {
 
 defaultproperties {
     interactionClass="MinSP.MSPInteraction"
-
-    perkChangeTraderMsg="You can only change perks during trader time"
 }
