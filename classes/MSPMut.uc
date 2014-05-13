@@ -3,6 +3,7 @@ class MSPMut extends Mutator
 
 var() config array<string> veterancyNames;
 var() config int minPerkLevel, maxPerkLevel;
+var() config bool loadStandardPerks;
 
 var int levelUpperBound, levelLowerBound;
 var string loginMenuClass;
@@ -14,8 +15,10 @@ function PostBeginPlay() {
     local int i;
     local array<string> packages;
     local class<KFVeterancyTypes> loadedVetType;
+    local KFGameType kfGT;
 
-    if (KFGameType(Level.Game) == none) {
+    kfGT= KFGameType(Level.Game);
+    if (kfGT == none) {
         Destroy();
         return;
     }
@@ -34,6 +37,13 @@ function PostBeginPlay() {
     for(i= 0; i < veterancyNames.Length; i++) {
         uniqueInsert(uniqueNames, veterancyNames[i]);
     }
+    if(loadStandardPerks) {
+        log("MSPMut: Loading perks from stock KF");
+        for(i= 0; i < kfGT.LoadedSkills.Length; i++) {
+            uniqueInsert(uniqueNames, String(kfGT.LoadedSkills[i]));
+        }
+    }
+
     log("Attempting to load"@uniqueNames.Length@"veterancy names");
     i= 0;
     while(i < uniqueNames.Length) {
@@ -108,6 +118,7 @@ static function FillPlayInfo(PlayInfo PlayInfo) {
     PlayInfo.AddSetting(default.GroupName, "veterancyNames", "Veterancy Names", 1, 1, "Text", "128",,,);
     PlayInfo.AddSetting(default.GroupName, "minPerkLevel", "Minimum Perk Level", 1, 1, "Text", "0.1;0:6");
     PlayInfo.AddSetting(default.GroupName, "maxPerkLevel", "Maximum Perk Level", 1, 1, "Text", "0.1;0:6");
+    PlayInfo.AddSetting(default.GroupName, "loadStandardPerks", "Use Standard Perks", 1, 1, "Check");
 }
 
 static event string GetDescriptionText(string property) {
@@ -118,6 +129,8 @@ static event string GetDescriptionText(string property) {
             return "Lowest allowed perk level";
         case "maxPerkLevel":
             return "Highest allowed perk level";
+        case "loadStandardPerks":
+            return "Include perks from the stock game";
         default:
             return super.GetDescriptionText(property);
     }
