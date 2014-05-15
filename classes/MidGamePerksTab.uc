@@ -19,6 +19,8 @@ function ShowPanel(bool bShow) {
         lb_PerkSelect.List.InitList(KFStatsAndAchievements);
         perkLevelsEdit.Setup(mspLRepInfo.minPerkLevel, mspLRepInfo.maxPerkLevel, 1);
         perkLevelsEdit.SetValue(mspLRepInfo.desiredPerkLevel);
+        lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()]
+                .default.LevelEffects[perkLevelsEdit.GetValue()]);
         InitGRI();
     }
 }

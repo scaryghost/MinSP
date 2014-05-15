@@ -17,6 +17,8 @@ function ShowPanel(bool bShow) {
             mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
             perkLevels.Setup(mspLRepInfo.minPerkLevel, mspLRepInfo.maxPerkLevel, 1);
             perkLevels.SetValue(mspLRepInfo.desiredPerkLevel);
+            lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()]
+                    .default.LevelEffects[perkLevels.GetValue()]);
         }
 
         l_ChangePerkOncePerWave.SetVisibility(false);
@@ -44,7 +46,9 @@ function bool OnSaveButtonClicked(GUIComponent Sender) {
 
     PC = PlayerOwner();
 
-    if (KFPlayerController(PC).bChangedVeterancyThisWave && KFPlayerController(PC).SelectedVeterancy != mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()]) {
+    if (KFPlayerController(PC).bChangedVeterancyThisWave && 
+            (KFPlayerController(PC).SelectedVeterancy != mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()] || 
+            mspLRepInfo.desiredPerkLevel != perkLevels.GetValue())) {
         l_ChangePerkOncePerWave.SetVisibility(true);
     } else {
         mspLRepInfo.desiredPerkLevel= perkLevels.GetValue();

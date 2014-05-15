@@ -22,6 +22,8 @@ function ShowPanel(bool bShow) {
         mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
         perkLevelsEdit.Setup(mspLRepInfo.minPerkLevel, mspLRepInfo.maxPerkLevel, 1);
         perkLevelsEdit.SetValue(mspLRepInfo.desiredPerkLevel);
+        lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()]
+                .default.LevelEffects[perkLevelsEdit.GetValue()]);
     }
 
     lb_PerkSelect.SetPosition(i_BGPerks.WinLeft + 6.0 / float(Controller.ResX),
@@ -62,7 +64,8 @@ function SaveSettings() {
 }
 
 function OnPerkSelected(GUIComponent Sender) {
-    lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()].default.LevelEffects[perkLevelsEdit.GetValue()]);
+    lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()]
+            .default.LevelEffects[perkLevelsEdit.GetValue()]);
     if (Sender == perkLevelsEdit) {
         PerkSelectList(lb_PerkSelect.List).updateLevelStrings(perkLevelsEdit.GetValue());
     }
