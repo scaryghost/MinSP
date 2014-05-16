@@ -58,6 +58,7 @@ function bool MyOnDraw(Canvas C) {
 }
 
 defaultproperties {
+    OnDraw=MyOnDraw;
     perkBack=Texture'KF_InterfaceArt_tex.Menu.Perk_box'
 
     Begin Object Class=GUIListBox Name=ListBox1

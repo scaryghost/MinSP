@@ -31,6 +31,8 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
     local bool touchingShopVolume;
     local GUITabControl tabControl;
     local GUITabPanel oldPerks;
+    local GUIBuyMenu menu;
+    local QuickPerkSelect qps;
     local int i;
 
     alias= ViewportOwner.Actor.ConsoleCommand("KEYBINDING"@ViewportOwner.Actor.ConsoleCommand("KEYNAME"@Key));
@@ -42,14 +44,20 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
         if (touchingShopVolume) {
             KFPlayerController(ViewportOwner.Actor).ShowBuyMenu("MyTrader", 
                KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight);
+            menu= GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage);
             tabControl= GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage).c_Tabs;
             i= tabControl.TabIndex(class'GUIBuyMenu'.default.PanelCaption[1]);
             log("MSPInteraction: index= " $ i);
             oldPerks= tabControl.BorrowPanel(class'GUIBuyMenu'.default.PanelCaption[1]);
-            tabControl.TabStack[i].MyPanel= GUITabPanel(GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage).AddComponent(perksGUITab.ClassName, True));
+            tabControl.TabStack[i].MyPanel= GUITabPanel(menu.AddComponent(perksGUITab.ClassName, True));
             tabControl.TabStack[i].MyPanel.Hide();
-            GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage).RemoveComponent(oldPerks, True);
+            menu.RemoveComponent(oldPerks, True);
             oldPerks.Free();
+            menu.RemoveComponent(menu.QuickPerkSelect, true);
+            menu.QuickPerkSelect.Free();
+            qps= QuickPerkSelect(menu.AddComponent("MinSP.QuickPerkSelect"));
+            qps.SetPosition(0.008008, 0.011906, 0.316601, 0.082460);
+            PerksTab(tabControl.TabStack[i].MyPanel).perksBox= qps.perkSelect;
             return true;
         }
     }
