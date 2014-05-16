@@ -1,6 +1,7 @@
 class MSPInteraction extends Interaction;
 
 var string buyMenuClass, lobbyMenuClass;
+var GUI.GUITabItem perksGUITab;
 
 event NotifyLevelChange() {
     Master.RemoveInteraction(self);
@@ -28,6 +29,9 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
     local string alias;
     local ShopVolume shop;
     local bool touchingShopVolume;
+    local GUITabControl tabControl;
+    local GUITabPanel oldPerks;
+    local int i;
 
     alias= ViewportOwner.Actor.ConsoleCommand("KEYBINDING"@ViewportOwner.Actor.ConsoleCommand("KEYNAME"@Key));
     if (Action == IST_Press && alias ~= "use" && !KFGameReplicationInfo(ViewportOwner.Actor.GameReplicationInfo).bWaveInProgress) {
@@ -35,9 +39,17 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
             touchingShopVolume= true;
             break;
         }
-        if (touchingShopVolume && Len(buyMenuClass) > 0) {
-            ViewportOwner.Actor.ClientOpenMenu(buyMenuClass,,"MyTrader", 
-                string(KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight));
+        if (touchingShopVolume) {
+            KFPlayerController(ViewportOwner.Actor).ShowBuyMenu("MyTrader", 
+               KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight);
+            tabControl= GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage).c_Tabs;
+            i= tabControl.TabIndex(class'GUIBuyMenu'.default.PanelCaption[1]);
+            log("MSPInteraction: index= " $ i);
+            oldPerks= tabControl.BorrowPanel(class'GUIBuyMenu'.default.PanelCaption[1]);
+            tabControl.TabStack[i].MyPanel= GUITabPanel(GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage).AddComponent(perksGUITab.ClassName, True));
+            tabControl.TabStack[i].MyPanel.Hide();
+            GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage).RemoveComponent(oldPerks, True);
+            oldPerks.Free();
             return true;
         }
     }
@@ -50,4 +62,6 @@ defaultproperties {
 
     buyMenuClass="MinSP.BuyMenu"
     lobbyMenuClass="MinSP.LobbyMenu"
+
+    perksGUITab=(ClassName="MinSP.PerksTab",Caption="MSP Perks",Hint="What's good nyugah")
 }
