@@ -1,7 +1,7 @@
 class MSPInteraction extends Interaction;
 
 var string buyMenuClass, lobbyMenuClass;
-var GUI.GUITabItem perksGUITab;
+var bool initializedBuyMenu;
 
 event NotifyLevelChange() {
     Master.RemoveInteraction(self);
@@ -44,20 +44,22 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
         if (touchingShopVolume) {
             KFPlayerController(ViewportOwner.Actor).ShowBuyMenu("MyTrader", 
                KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight);
-            menu= GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage);
-            tabControl= GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage).c_Tabs;
-            i= tabControl.TabIndex(class'GUIBuyMenu'.default.PanelCaption[1]);
-            log("MSPInteraction: index= " $ i);
-            oldPerks= tabControl.BorrowPanel(class'GUIBuyMenu'.default.PanelCaption[1]);
-            tabControl.TabStack[i].MyPanel= GUITabPanel(menu.AddComponent(perksGUITab.ClassName, True));
-            tabControl.TabStack[i].MyPanel.Hide();
-            menu.RemoveComponent(oldPerks, True);
-            oldPerks.Free();
-            menu.RemoveComponent(menu.QuickPerkSelect, true);
-            menu.QuickPerkSelect.Free();
-            qps= QuickPerkSelect(menu.AddComponent("MinSP.QuickPerkSelect"));
-            qps.SetPosition(0.008008, 0.011906, 0.316601, 0.082460);
-            PerksTab(tabControl.TabStack[i].MyPanel).perksBox= qps.perkSelect;
+            if (!initializedBuyMenu) {
+                menu= GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage);
+                tabControl= menu.c_Tabs;
+                i= tabControl.TabIndex(class'GUIBuyMenu'.default.PanelCaption[1]);
+                oldPerks= tabControl.BorrowPanel(class'GUIBuyMenu'.default.PanelCaption[1]);
+                tabControl.TabStack[i].MyPanel= GUITabPanel(menu.AddComponent("MinSP.PerksTab", True));
+                tabControl.TabStack[i].MyPanel.Hide();
+                menu.RemoveComponent(oldPerks, True);
+                oldPerks.Free();
+                menu.RemoveComponent(menu.QuickPerkSelect, true);
+                menu.QuickPerkSelect.Free();
+                qps= QuickPerkSelect(menu.AddComponent("MinSP.QuickPerkSelect"));
+                qps.SetPosition(0.008008, 0.011906, 0.316601, 0.082460);
+                PerksTab(tabControl.TabStack[i].MyPanel).perksBox= qps.perkSelect;
+                initializedBuyMenu= true;
+            }
             return true;
         }
     }
@@ -70,6 +72,4 @@ defaultproperties {
 
     buyMenuClass="MinSP.BuyMenu"
     lobbyMenuClass="MinSP.LobbyMenu"
-
-    perksGUITab=(ClassName="MinSP.PerksTab",Caption="MSP Perks",Hint="What's good nyugah")
 }
