@@ -106,11 +106,7 @@ function GetServerDetails(out GameInfo.ServerResponseLine ServerState) {
 
 
 function sendVeterancyTypes(MSPLinkedReplicationInfo mspLRepInfo) {
-    local int j;
-
-    for(j= 0; j < loadedVeterancyTypes.Length; j++) {
-        mspLRepInfo.addVeterancyType(loadedVeterancyTypes[j], uniqueNames[j]);
-    }
+    mspLRepInfo.addVeterancyTypes(loadedVeterancyTypes);
 }
 
 static function FillPlayInfo(PlayInfo PlayInfo) {

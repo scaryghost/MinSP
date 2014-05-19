@@ -33,21 +33,41 @@ simulated function Tick(float DeltaTime) {
     }
 }
 
-simulated function flushToClient(string vetName) {
-    veterancyTypes[veterancyTypes.Length]= class<KFVeterancyTypes>(DynamicLoadObject(vetName, class'Class'));
+simulated function flushToClient(string vetNames) {
+    local int i;
+    local array<string> parts;
+
+    Split(vetNames, ";", parts);
+    for(i= 0; i < parts.Length; i++) {
+        veterancyTypes[veterancyTypes.Length]= class<KFVeterancyTypes>(DynamicLoadObject(parts[i], class'Class'));
+    }
 }
 
-function addVeterancyType(class<KFVeterancyTypes> type, string vetName) {
-    local int i;
+function addVeterancyTypes(array<class<KFVeterancyTypes> > types) {
+    local int i, j;
+    local array<string> classnames, parts;
     local PlayerController localController;
 
     localController= Level.GetLocalPlayerController();
-    for(i= 0; i < veterancyTypes.Length && veterancyTypes[i] != type; i++) {
+    for(j= 0; j < types.Length; j++) {
+        for(i= 0; i < veterancyTypes.Length && veterancyTypes[i] != types[j]; i++) {
+        }
+        if (i >= veterancyTypes.Length) {
+            veterancyTypes[veterancyTypes.Length]= types[j];
+            parts[parts.Length]= string(types[j]);
+            if (parts.Length == 4) {
+                classnames[classnames.Length]= join(parts, ";");
+                parts.Length= 0;
+            }
+        }
     }
-    if (i >= veterancyTypes.Length) {
-        veterancyTypes[veterancyTypes.Length]= type;
-        if (localController == none) {
-            flushToClient(vetName);
+    if (parts.Length > 0) {
+        classnames[classnames.Length]= join(parts, ";");
+        parts.Length= 0;
+    }
+    if (localController == none) {
+        for(i= 0; i < classnames.Length; i++) {
+            flushToClient(classnames[i]);
         }
     }
 }
@@ -106,6 +126,19 @@ static function MSPLinkedReplicationInfo findLRI(PlayerReplicationInfo pri) {
         return None;
     }
     return MSPLinkedReplicationInfo(lriIt);
+}
+
+static function string join(array<string> parts, string separator) {
+    local int i;
+    local string whole;
+
+    for(i= 0; i < parts.Length; i++) {
+        if (i != 0) {
+            whole$= separator;
+        }
+        whole$= parts[i];
+    }
+    return whole;
 }
 
 defaultproperties {
