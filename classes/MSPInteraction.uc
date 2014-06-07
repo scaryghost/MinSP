@@ -1,9 +1,11 @@
 class MSPInteraction extends Interaction;
 
+var GUIBuyMenu menu;
 var string buyMenuClass, lobbyMenuClass;
 var bool initializedBuyMenu;
 
 event NotifyLevelChange() {
+    menu.bPersistent= false;
     Master.RemoveInteraction(self);
 }
 
@@ -31,7 +33,6 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
     local bool touchingShopVolume;
     local GUITabControl tabControl;
     local GUITabPanel oldPerks;
-    local GUIBuyMenu menu;
     local QuickPerkSelect qps;
     local int i;
 
@@ -42,10 +43,13 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
             break;
         }
         if (touchingShopVolume) {
-            KFPlayerController(ViewportOwner.Actor).ShowBuyMenu("MyTrader", 
-               KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight);
-            if (!initializedBuyMenu) {
+            menu= GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage);
+            if (menu == none) {
+                KFPlayerController(ViewportOwner.Actor).ShowBuyMenu("MyTrader", 
+                       KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight);
                 menu= GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage);
+            }
+            if (!initializedBuyMenu) {
                 tabControl= menu.c_Tabs;
                 i= tabControl.TabIndex(class'GUIBuyMenu'.default.PanelCaption[1]);
                 oldPerks= tabControl.BorrowPanel(class'GUIBuyMenu'.default.PanelCaption[1]);
