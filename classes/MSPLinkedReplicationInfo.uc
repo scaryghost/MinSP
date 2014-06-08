@@ -1,6 +1,6 @@
 class MSPLinkedReplicationInfo extends LinkedReplicationInfo;
 
-var string interactionClass;
+var PlayerReplicationInfo ownerPRI;
 var KFPlayerController ownerController;
 var array<class<KFVeterancyTypes> > veterancyTypes;
 var MSPMut mut;
@@ -11,26 +11,20 @@ replication {
     reliable if (Role < ROLE_Authority)
        sendPerkToServer;
     reliable if (Role == ROLE_Authority)
-        flushToClient, desiredPerkLevel, minPerkLevel, maxPerkLevel;
+        flushToClient, desiredPerkLevel, minPerkLevel, maxPerkLevel, 
+        ownerPRI;
 }
 
 simulated function Tick(float DeltaTime) {
-    local PlayerController localController;
-
     super.Tick(DeltaTime);
 
-    if (!initialized) {
-        if (Role == ROLE_Authority) {
-            mut.sendVeterancyTypes(self);
-            PlayerController(Owner).SteamStatsAndAchievements.Destroy();
-            PlayerController(Owner).SteamStatsAndAchievements= spawn(class'MinsP.MSPSteamStats', Owner);
-        }
-        localController= Level.GetLocalPlayerController();
-        if (localController != none) {
-            localController.Player.InteractionMaster.AddInteraction(interactionClass, localController.Player);
-        }
-        initialized= true;
+    if (Role == ROLE_Authority) {
+        mut.sendVeterancyTypes(self);
+        PlayerController(Owner).SteamStatsAndAchievements.Destroy();
+        PlayerController(Owner).SteamStatsAndAchievements= spawn(class'MinsP.MSPSteamStats', Owner);
     }
+        
+    Disable('Tick');
 }
 
 simulated function flushToClient(string vetNames) {
@@ -83,13 +77,12 @@ function sendPerkToServer(class<KFVeterancyTypes> perk, int level) {
 
         if (KFGameReplicationInfo(kfPC.GameReplicationInfo).bWaveInProgress && kfPC.SelectedVeterancy != kfRepInfo.ClientVeteranSkill) {
             kfPC.ClientMessage(Repl(kfPC.YouWillBecomePerkString, "%Perk%", perk.default.VeterancyName));
-        } else if (!kfPC.bChangedVeterancyThisWave) {
+        } else if (!ownerPRI.bReadyToPlay || !kfPC.bChangedVeterancyThisWave) {
             if (kfPC.SelectedVeterancy != kfRepInfo.ClientVeteranSkill) {
                 kfPC.ClientMessage(Repl(kfPC.YouAreNowPerkString, "%Perk%", kfPC.SelectedVeterancy.Default.VeterancyName));
             }
-            if (kfPC.GameReplicationInfo.bMatchHasBegun) {
-                kfPC.bChangedVeterancyThisWave = true;
-            }
+
+            kfPC.bChangedVeterancyThisWave= kfPC.GameReplicationInfo.bMatchHasBegun && ownerPRI.bReadyToPlay;
 
             kfRepInfo.ClientVeteranSkill = kfPC.SelectedVeterancy;
             kfRepInfo.ClientVeteranSkillLevel= level;
@@ -115,6 +108,7 @@ simulated function changeRandomPerk() {
 
 static function MSPLinkedReplicationInfo findLRI(PlayerReplicationInfo pri) {
     local LinkedReplicationInfo lriIt;
+    local MSPLinkedReplicationInfo mspIt;
 
     if (pri == None) {
         return None;
@@ -123,6 +117,9 @@ static function MSPLinkedReplicationInfo findLRI(PlayerReplicationInfo pri) {
             lriIt= lriIt.NextReplicationInfo) {
     }
     if (lriIt == None) {
+        foreach pri.DynamicActors(class'MSPLinkedReplicationInfo', mspIt)
+            if (mspIt.ownerPRI == pri) 
+                return mspIt;
         return None;
     }
     return MSPLinkedReplicationInfo(lriIt);
@@ -139,8 +136,4 @@ static function string join(array<string> parts, string separator) {
         whole$= parts[i];
     }
     return whole;
-}
-
-defaultproperties {
-    interactionClass="MinSP.MSPInteraction"
 }

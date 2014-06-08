@@ -12,9 +12,9 @@ function ShowPanel(bool bShow) {
             KFStatsAndAchievements= KFSteamStatsAndAchievements(PlayerOwner().SteamStatsAndAchievements);
 
             // Initialize the List
-            lb_PerkSelect.List.InitList(KFStatsAndAchievements);
-
             mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
+            PerkSelectList(lb_PerkSelect.List).InitList_MSPLRepInfo(mspLRepInfo);
+
             perkLevels.Setup(mspLRepInfo.minPerkLevel, mspLRepInfo.maxPerkLevel, 1);
             perkLevels.SetValue(mspLRepInfo.desiredPerkLevel);
             lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()]
@@ -42,19 +42,19 @@ function OnPerkSelected(GUIComponent Sender) {
 }
 
 function bool OnSaveButtonClicked(GUIComponent Sender) {
-    local PlayerController PC;
+    local KFPlayerController kfPC;
 
-    PC = PlayerOwner();
+    kfPC= KFPlayerController(PlayerOwner());
 
-    if (KFPlayerController(PC).bChangedVeterancyThisWave && 
-            (KFPlayerController(PC).SelectedVeterancy != mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()] || 
+    if (kfPC.bChangedVeterancyThisWave && 
+            (kfPC.SelectedVeterancy != mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()] || 
             mspLRepInfo.desiredPerkLevel != perkLevels.GetValue())) {
         l_ChangePerkOncePerWave.SetVisibility(true);
     } else {
         mspLRepInfo.desiredPerkLevel= perkLevels.GetValue();
         mspLRepInfo.changePerk(lb_PerkSelect.GetIndex());
         perksBox.DisableMe();
-        perksBox.Edit.SetText(KFPlayerController(PC).SelectedVeterancy.default.VeterancyName);
+        perksBox.Edit.SetText(kfPC.SelectedVeterancy.default.VeterancyName);
         PerksBox.Edit.SetFocus(None);
     }
 

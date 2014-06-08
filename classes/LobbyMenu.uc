@@ -19,12 +19,9 @@ function InitComponent(GUIController MyC, GUIComponent MyO) {
     i_Portrait.WinTop= PlayerPortraitBG.ActualTop() + 30;
     i_Portrait.WinHeight= PlayerPortraitBG.ActualHeight() - 36;
     t_ChatBox.FocusInstead= PerkClickLabel;
-    
-    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
 }
 
 event Opened(GUIComponent Sender) {
-    bShouldUpdateVeterancy = true;
     SetTimer(1,true);
     VideoTimer = 0.0;
     VideoPlayed = false;
@@ -37,6 +34,8 @@ event Opened(GUIComponent Sender) {
         WaveBG.Image= Texture'KillingFloorHUD.HUD.Hud_Bio_Circle';
         WaveLabel.EnableMe();
     }
+
+    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
 }
 
 function bool ShowPerkMenu(GUIComponent Sender) {
@@ -77,10 +76,6 @@ function bool InternalOnPreDraw(Canvas C) {
     } else {
         WaveLabel.Caption= "";
         WaveLabel.DisableMe();
-    }
-    if (KFPlayerController(PC) != none && bShouldUpdateVeterancy) {
-        mspLRepInfo.changeRandomPerk();
-        bShouldUpdateVeterancy = false;
     }
 
     // First fill in non-ready players.
@@ -212,7 +207,6 @@ function DrawPerk(Canvas Canvas) {
         modInfoText$= "|" $ maxPerkMsg $ ":  " $ mspLRepInfo.minPerkLevel;
         modInfoText$= "|" $ minPerkMsg $ ":  " $ mspLRepInfo.maxPerkLevel;
         modInfoText$= "|" $ numPerksMsg $ ": " $ mspLRepInfo.veterancyTypes.Length;
-
         modInfoTextBox.SetContent(modInfoText);
         drawn= true;
     }
@@ -298,6 +292,7 @@ defaultproperties {
     numPerksMsg="Number of perks"
     modInfoText="MinSP"
     profilePage="MinSP.ProfilePage"
+    OnPreDraw=InternalOnPreDraw
 
     Begin Object Class=MinSP.LobbyFooter Name=Footer
         RenderWeight=0.300000

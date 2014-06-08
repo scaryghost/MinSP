@@ -6,10 +6,20 @@ var() config int minPerkLevel, maxPerkLevel;
 var() config bool loadStandardPerks;
 
 var int levelUpperBound, levelLowerBound;
-var string loginMenuClass;
+var string loginMenuClass, interactionClass;
 var array<string> uniqueNames;
 var array<class<KFVeterancyTypes> > loadedVeterancyTypes;
 var String version;
+
+simulated function Tick(float DeltaTime) {
+    local PlayerController localController;
+
+    localController= Level.GetLocalPlayerController();
+    if (localController != none) {
+        localController.Player.InteractionMaster.AddInteraction(interactionClass, localController.Player);
+    }
+    Disable('Tick');
+}
 
 function PostBeginPlay() {
     local int i;
@@ -78,6 +88,7 @@ function bool CheckReplacement(Actor Other, out byte bSuperRelevant) {
         mspLRepInfo.minPerkLevel= minPerkLevel;
         mspLRepInfo.maxPerkLevel= maxPerkLevel;
         mspLRepInfo.desiredPerkLevel= maxPerkLevel;
+        mspLRepInfo.ownerPRI= kfPRepInfo;
         kfPRepInfo.CustomReplicationInfo= mspLRepInfo;
         kfPRepInfo.ClientVeteranSkillLevel= mspLRepInfo.desiredPerkLevel;
     }
@@ -104,6 +115,10 @@ function GetServerDetails(out GameInfo.ServerResponseLine ServerState) {
     ServerState.ServerInfo[i + 1].Value= String(maxPerkLevel);
 }
 
+function ModifyPlayer(Pawn Other) {
+    Other.PlayerReplicationInfo.bReadyToPlay= true;
+    super.ModifyPlayer(Other);
+}
 
 function sendVeterancyTypes(MSPLinkedReplicationInfo mspLRepInfo) {
     mspLRepInfo.addVeterancyTypes(loadedVeterancyTypes);
@@ -163,12 +178,16 @@ static function uniqueInsert(out array<string> list, string key) {
 }
 
 defaultproperties {
+    RemoteRole= ROLE_SimulatedProxy
+    bAlwaysRelevant= true
+    
     GroupName="KFMinSP"
     FriendlyName="Minimalist Server Perks"
     Description="Minimalist environment for using custom perks.  Version 1.0.0"
     version="1.0.0"
 
     loginMenuClass="MinSP.InvasionLoginMenu"
+    interactionClass="MinSP.MSPInteraction"
 
     maxPerkLevel=6
     minPerkLevel=0

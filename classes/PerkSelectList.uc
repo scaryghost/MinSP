@@ -2,16 +2,13 @@ class PerkSelectList extends KFPerkSelectList;
 
 var MSPLinkedReplicationInfo mspLRepInfo;
 
-function InitList(KFSteamStatsAndAchievements StatsAndAchievements) {
+function InitList_MSPLRepInfo(MSPLinkedReplicationInfo lRepInfo) {
     local int i;
     local KFPlayerController KFPC;
 
     // Grab the Player Controller for later use
     KFPC= KFPlayerController(PlayerOwner());
-    mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
-
-    // Hold onto our reference
-    KFStatsAndAchievements= StatsAndAchievements;
+    mspLRepInfo= lRepInfo;
 
     // Update the ItemCount and select the first item
     ItemCount= mspLRepInfo.veterancyTypes.Length;

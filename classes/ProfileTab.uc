@@ -18,8 +18,8 @@ function ShowPanel(bool bShow) {
             bInit= False;
         }
 
-        lb_PerkSelect.List.InitList(KFStatsAndAchievements);
         mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PlayerOwner().PlayerReplicationInfo);
+        PerkSelectList(lb_PerkSelect.List).InitList_MSPLRepInfo(mspLRepInfo);
         perkLevelsEdit.Setup(mspLRepInfo.minPerkLevel, mspLRepInfo.maxPerkLevel, 1);
         perkLevelsEdit.SetValue(mspLRepInfo.desiredPerkLevel);
         lb_PerkEffects.SetContent(mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()]
