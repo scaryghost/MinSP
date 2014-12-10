@@ -22,6 +22,7 @@ simulated function Tick(float DeltaTime) {
         mut.sendVeterancyTypes(self);
         PlayerController(Owner).SteamStatsAndAchievements.Destroy();
         PlayerController(Owner).SteamStatsAndAchievements= spawn(class'MinsP.MSPSteamStats', Owner);
+        ownerPRI.SteamStatsAndAchievements= PlayerController(Owner).SteamStatsAndAchievements;
     }
         
     Disable('Tick');
