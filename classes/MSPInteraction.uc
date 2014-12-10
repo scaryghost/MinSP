@@ -30,7 +30,6 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
     local string alias;
     local ShopVolume shop;
     local GUITabControl tabControl;
-    local GUITabPanel oldPerks;
     local QuickPerkSelect qps;
     local int i;
 
@@ -45,11 +44,8 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
                 menu= GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage);
                 tabControl= menu.c_Tabs;
                 i= tabControl.TabIndex(class'GUIBuyMenu'.default.PanelCaption[1]);
-                oldPerks= tabControl.BorrowPanel(class'GUIBuyMenu'.default.PanelCaption[1]);
-                tabControl.TabStack[i].MyPanel= GUITabPanel(menu.AddComponent("MinSP.PerksTab", True));
-                tabControl.TabStack[i].MyPanel.Hide();
-                menu.RemoveComponent(oldPerks, True);
-                oldPerks.Free();
+                tabControl.ReplaceTab(tabControl.TabStack[i], class'GUIBuyMenu'.default.PanelCaption[1], 
+                        "MinSP.PerksTab", None, class'GUIBuyMenu'.default.PanelHint[1], false);
 
                 menu.RemoveComponent(menu.QuickPerkSelect, true);
                 menu.QuickPerkSelect.Free();
