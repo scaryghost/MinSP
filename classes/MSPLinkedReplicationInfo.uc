@@ -17,10 +17,8 @@ replication {
 
 simulated function Tick(float DeltaTime) {
     super.Tick(DeltaTime);
-
     if (Role == ROLE_Authority) {
         mut.sendVeterancyTypes(self);
-        PlayerController(Owner).SteamStatsAndAchievements.Destroy();
         PlayerController(Owner).SteamStatsAndAchievements= spawn(class'MinsP.MSPSteamStats', Owner);
         ownerPRI.SteamStatsAndAchievements= PlayerController(Owner).SteamStatsAndAchievements;
     }
