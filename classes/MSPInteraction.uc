@@ -27,20 +27,30 @@ function Tick (float DeltaTime) {
 }
 
 function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
+    local KFPlayerController kfPC;
     local string alias;
     local ShopVolume shop;
     local GUITabControl tabControl;
     local QuickPerkSelect qps;
     local int i;
+    local bool canOpenTrader, isObjectiveMode;
+    local KF_StoryObjective currentObj;
 
     alias= ViewportOwner.Actor.ConsoleCommand("KEYBINDING"@ViewportOwner.Actor.ConsoleCommand("KEYNAME"@Key));
-    if (Action == IST_Press && alias ~= "use" && !KFGameReplicationInfo(ViewportOwner.Actor.GameReplicationInfo).bWaveInProgress) {
+    kfPC= KFPlayerController(ViewportOwner.Actor);
+    isObjectiveMode= kfPC.GameReplicationInfo.IsA('KF_StoryGRI');
+    if (isObjectiveMode) {
+        currentObj= KF_StoryGRI(kfPC.GameReplicationInfo).GetCurrentObjective();
+    }
+    canOpenTrader= isObjectiveMode && (currentObj == None || currentObj.IsTraderObj() || 
+                    KF_StoryGRI(kfPC.GameReplicationInfo).MaxMonsters == 0) || 
+                !isObjectiveMode && !KFGameReplicationInfo(kfPC.GameReplicationInfo).bWaveInProgress;
+
+    if (canOpenTrader && Action == IST_Press && alias ~= "use") {
         foreach ViewportOwner.Actor.Pawn.TouchingActors(class'ShopVolume', shop) {
             if (!ClassIsChildOf(KFGUIController(ViewportOwner.GUIController).ActivePage.class, class'KFGui.GUIBuyMenu')) {
-                KFPlayerController(ViewportOwner.Actor).SelectedVeterancy= 
-                        KFPlayerReplicationInfo(ViewportOwner.Actor.PlayerReplicationInfo).ClientVeteranSkill;
-                KFPlayerController(ViewportOwner.Actor).ShowBuyMenu("MyTrader", 
-                       KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight);
+                kfPC.SelectedVeterancy= KFPlayerReplicationInfo(kfPC.PlayerReplicationInfo).ClientVeteranSkill;
+                kfPC.ShowBuyMenu("MyTrader", KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight);
             }
             if (menu == none) {
                 menu= GUIBuyMenu(KFGUIController(ViewportOwner.GUIController).ActivePage);

@@ -69,7 +69,8 @@ function addVeterancyTypes(array<class<KFVeterancyTypes> > types) {
 function sendPerkToServer(class<KFVeterancyTypes> perk, int level) {
     local KFPlayerController kfPC;
     local KFPlayerReplicationInfo kfRepInfo;
-    local bool selectedNewPerk;
+    local bool selectedNewPerk, canChangePerk, isObjectiveMode;
+    local KF_StoryObjective currentObj;
 
     kfPC= KFPlayerController(Owner);
     kfRepInfo= KFPlayerReplicationInfo(kfPC.PlayerReplicationInfo);
@@ -78,7 +79,15 @@ function sendPerkToServer(class<KFVeterancyTypes> perk, int level) {
         desiredPerkLevel= level;
 
         selectedNewPerk= desiredPerk != kfRepInfo.ClientVeteranSkill || desiredPerkLevel != kfRepInfo.ClientVeteranSkillLevel;
-        if (KFGameReplicationInfo(kfPC.GameReplicationInfo).bWaveInProgress && selectedNewPerk) {
+        isObjectiveMode= kfPC.GameReplicationInfo.IsA('KF_StoryGRI');
+        if (isObjectiveMode) {
+            currentObj= KF_StoryGRI(kfPC.GameReplicationInfo).GetCurrentObjective();
+        }
+        canChangePerk= isObjectiveMode && (currentObj == None || currentObj.IsTraderObj() || 
+                    KF_StoryGRI(kfPC.GameReplicationInfo).MaxMonsters == 0) || 
+                !isObjectiveMode && !KFGameReplicationInfo(kfPC.GameReplicationInfo).bWaveInProgress;
+
+        if (!canChangePerk && selectedNewPerk) {
             kfPC.ClientMessage(Repl(kfPC.YouWillBecomePerkString, "%Perk%", perk.default.VeterancyName));
         } else if (!ownerPRI.bReadyToPlay || !kfPC.bChangedVeterancyThisWave) {
             if (selectedNewPerk) {
