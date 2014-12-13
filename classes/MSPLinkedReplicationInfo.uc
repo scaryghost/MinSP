@@ -3,6 +3,7 @@ class MSPLinkedReplicationInfo extends LinkedReplicationInfo;
 var PlayerReplicationInfo ownerPRI;
 var KFPlayerController ownerController;
 var array<class<KFVeterancyTypes> > veterancyTypes;
+var class<KFVeterancyTypes> desiredPerk;
 var MSPMut mut;
 var bool initialized;
 var int desiredPerkLevel, minPerkLevel, maxPerkLevel;
@@ -68,22 +69,26 @@ function addVeterancyTypes(array<class<KFVeterancyTypes> > types) {
 function sendPerkToServer(class<KFVeterancyTypes> perk, int level) {
     local KFPlayerController kfPC;
     local KFPlayerReplicationInfo kfRepInfo;
+    local bool selectedNewPerk;
 
     kfPC= KFPlayerController(Owner);
     kfRepInfo= KFPlayerReplicationInfo(kfPC.PlayerReplicationInfo);
     if (kfPC != none && kfRepInfo != none) {
-        kfPC.SelectedVeterancy= perk;
+        desiredPerk= perk;
+        desiredPerkLevel= level;
 
-        if (KFGameReplicationInfo(kfPC.GameReplicationInfo).bWaveInProgress && kfPC.SelectedVeterancy != kfRepInfo.ClientVeteranSkill) {
+        selectedNewPerk= desiredPerk != kfRepInfo.ClientVeteranSkill || desiredPerkLevel != kfRepInfo.ClientVeteranSkillLevel;
+        if (KFGameReplicationInfo(kfPC.GameReplicationInfo).bWaveInProgress && selectedNewPerk) {
             kfPC.ClientMessage(Repl(kfPC.YouWillBecomePerkString, "%Perk%", perk.default.VeterancyName));
         } else if (!ownerPRI.bReadyToPlay || !kfPC.bChangedVeterancyThisWave) {
-            if (kfPC.SelectedVeterancy != kfRepInfo.ClientVeteranSkill) {
-                kfPC.ClientMessage(Repl(kfPC.YouAreNowPerkString, "%Perk%", kfPC.SelectedVeterancy.Default.VeterancyName));
+            if (selectedNewPerk) {
+                kfPC.ClientMessage(Repl(kfPC.YouAreNowPerkString, "%Perk%", desiredPerk.default.VeterancyName));
             }
 
-            kfPC.bChangedVeterancyThisWave= kfPC.GameReplicationInfo.bMatchHasBegun && ownerPRI.bReadyToPlay;
+            kfPC.bChangedVeterancyThisWave= selectedNewPerk && kfPC.GameReplicationInfo.bMatchHasBegun && ownerPRI.bReadyToPlay;
 
-            kfRepInfo.ClientVeteranSkill = kfPC.SelectedVeterancy;
+            kfPC.SelectedVeterancy= desiredPerk;
+            kfRepInfo.ClientVeteranSkill= desiredPerk;
             kfRepInfo.ClientVeteranSkillLevel= level;
 
             if (KFHumanPawn(kfPC.Pawn) != none) {
@@ -92,13 +97,12 @@ function sendPerkToServer(class<KFVeterancyTypes> perk, int level) {
         } else {
             kfPC.ClientMessage(kfPC.PerkChangeOncePerWaveString);
         }
-        desiredPerkLevel= level;
     }
 }
 
 simulated function changePerk(int perkIndex) {
-    ownerController.SelectedVeterancy= veterancyTypes[perkIndex];
-    sendPerkToServer(ownerController.SelectedVeterancy, desiredPerkLevel);
+    desiredPerk= veterancyTypes[perkIndex];
+    sendPerkToServer(desiredPerk, desiredPerkLevel);
 }
 
 simulated function changeRandomPerk() {

@@ -37,6 +37,8 @@ function bool KeyEvent(EInputKey Key, EInputAction Action, float Delta ) {
     if (Action == IST_Press && alias ~= "use" && !KFGameReplicationInfo(ViewportOwner.Actor.GameReplicationInfo).bWaveInProgress) {
         foreach ViewportOwner.Actor.Pawn.TouchingActors(class'ShopVolume', shop) {
             if (!ClassIsChildOf(KFGUIController(ViewportOwner.GUIController).ActivePage.class, class'KFGui.GUIBuyMenu')) {
+                KFPlayerController(ViewportOwner.Actor).SelectedVeterancy= 
+                        KFPlayerReplicationInfo(ViewportOwner.Actor.PlayerReplicationInfo).ClientVeteranSkill;
                 KFPlayerController(ViewportOwner.Actor).ShowBuyMenu("MyTrader", 
                        KFHumanPawn(ViewportOwner.Actor.Pawn).MaxCarryWeight);
             }

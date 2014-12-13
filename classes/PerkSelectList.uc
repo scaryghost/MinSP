@@ -23,7 +23,7 @@ function InitList_MSPLRepInfo(MSPLinkedReplicationInfo lRepInfo) {
         PerkLevelString[PerkLevelString.Length] = LvAbbrString @ KFPlayerReplicationInfo(KFPC.PlayerReplicationInfo).ClientVeteranSkillLevel;
         PerkProgress[PerkProgress.Length] = 0;
 
-        if (mspLRepInfo.veterancyTypes[i] == KFPC.SelectedVeterancy) {
+        if (mspLRepInfo.veterancyTypes[i] == mspLRepInfo.desiredPerk) {
             SetIndex(i);
         }
     }

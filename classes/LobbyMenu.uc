@@ -212,7 +212,7 @@ function DrawPerk(Canvas Canvas) {
     }
 
     LevelIndex= KFPlayerReplicationInfo(PlayerOwner().PlayerReplicationInfo).ClientVeteranSkillLevel;
-    PerkName=  KFPlayerController(PlayerOwner()).SelectedVeterancy.default.VeterancyName;
+    PerkName=  mspLRepInfo.desiredPerk.default.VeterancyName;
     PerkLevelString= LvAbbrString @ LevelIndex;
     PerkProgress= 0;
 
@@ -247,7 +247,7 @@ function DrawPerk(Canvas Canvas) {
 
     // Draw Icon
     Canvas.SetPos(TempX + IconBorder * Height, TempY + IconBorder * Height);
-    Canvas.DrawTile(KFPlayerController(PlayerOwner()).SelectedVeterancy.default.OnHUDIcon, IconSize, IconSize, 0, 0, 256, 256);
+    Canvas.DrawTile(mspLRepInfo.desiredPerk.default.OnHUDIcon, IconSize, IconSize, 0, 0, 256, 256);
 
     TempX+= IconSize + (IconToInfoSpacing * Width);
     TempY+= TextTopOffset * Height + ItemBorder * Height;
@@ -278,9 +278,9 @@ function DrawPerk(Canvas Canvas) {
     Canvas.SetPos(TempX + 3.0, TempY + 3.0);
     Canvas.DrawTileStretched(ProgressBarForeground, (ProgressBarWidth - 6.0) * PerkProgress, (ProgressBarHeight * Height) - 6.0);
 
-    if (CurrentVeterancy != KFPlayerController(PlayerOwner()).SelectedVeterancy || CurrentVeterancyLevel != LevelIndex) {
-        lb_PerkEffects.SetContent(KFPlayerController(PlayerOwner()).SelectedVeterancy.default.LevelEffects[LevelIndex]);
-        CurrentVeterancy = KFPlayerController(PlayerOwner()).SelectedVeterancy;
+    if (CurrentVeterancy != mspLRepInfo.desiredPerk || CurrentVeterancyLevel != LevelIndex) {
+        lb_PerkEffects.SetContent(mspLRepInfo.desiredPerk.default.LevelEffects[LevelIndex]);
+        CurrentVeterancy = mspLRepInfo.desiredPerk;
         CurrentVeterancyLevel = LevelIndex;
     }
 }

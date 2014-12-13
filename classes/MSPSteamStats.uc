@@ -9,6 +9,15 @@ function WaveEnded() {
         kfrLRepInfo= class'MSPLinkedReplicationInfo'.static.
                 findLRI(PlayerController(Owner).PlayerReplicationInfo);
     }
-    KFPlayerReplicationInfo(PlayerController(Owner).PlayerReplicationInfo).
-            ClientVeteranSkillLevel= kfrLRepInfo.desiredPerkLevel;
+    kfrLRepInfo.sendPerkToServer(kfrLRepInfo.desiredPerk, kfrLRepInfo.desiredPerkLevel);
+}
+
+function OnObjectiveCompleted(name ObjectiveName) {
+    super.OnObjectiveCompleted(ObjectiveName);
+
+    if (kfrLRepInfo == None) {
+        kfrLRepInfo= class'MSPLinkedReplicationInfo'.static.
+                findLRI(PlayerController(Owner).PlayerReplicationInfo);
+    }
+    kfrLRepInfo.sendPerkToServer(kfrLRepInfo.desiredPerk, kfrLRepInfo.desiredPerkLevel);
 }

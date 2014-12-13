@@ -17,7 +17,7 @@ function bool OnFooterClick(GUIComponent Sender) {
             if (PC.Level.NetMode == NM_Standalone || !PC.PlayerReplicationInfo.bReadyToPlay) {
                 if (KFPlayerController(PC) != none) {
                     mspLRepInfo= class'MSPLinkedReplicationInfo'.static.findLRI(PC.PlayerReplicationInfo);
-                    mspLRepInfo.sendPerkToServer(KFPlayerController(PC).SelectedVeterancy, mspLRepInfo.desiredPerkLevel);
+                    mspLRepInfo.sendPerkToServer(mspLRepInfo.desiredPerk, mspLRepInfo.desiredPerkLevel);
                 }
 
                 //Set Ready

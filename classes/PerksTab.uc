@@ -47,14 +47,14 @@ function bool OnSaveButtonClicked(GUIComponent Sender) {
     kfPC= KFPlayerController(PlayerOwner());
 
     if (kfPC.bChangedVeterancyThisWave && 
-            (kfPC.SelectedVeterancy != mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()] || 
-            mspLRepInfo.desiredPerkLevel != perkLevels.GetValue())) {
+            mspLRepInfo.desiredPerk != mspLRepInfo.veterancyTypes[lb_PerkSelect.GetIndex()] || 
+            mspLRepInfo.desiredPerkLevel != perkLevels.GetValue()) {
         l_ChangePerkOncePerWave.SetVisibility(true);
     } else {
         mspLRepInfo.desiredPerkLevel= perkLevels.GetValue();
         mspLRepInfo.changePerk(lb_PerkSelect.GetIndex());
         perksBox.DisableMe();
-        perksBox.Edit.SetText(kfPC.SelectedVeterancy.default.VeterancyName);
+        perksBox.Edit.SetText(mspLRepInfo.desiredPerk.default.VeterancyName);
         PerksBox.Edit.SetFocus(None);
     }
 
