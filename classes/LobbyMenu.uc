@@ -1,7 +1,7 @@
 class LobbyMenu extends LobbyMenu_Story;
 
 var MSPLinkedReplicationInfo mspLRepInfo;
-var localized string modInfoText, maxPerkMsg, minPerkMsg, numPerksMsg;
+var localized string modInfoText, maxPerkMsg, minPerkMsg, numPerksMsg, versionMsg;
 var bool drawn;
 var string profilePage;
 var automated GUIScrollTextBox modInfoTextBox;
@@ -203,7 +203,7 @@ function DrawPerk(Canvas Canvas) {
         modInfoTextBox.WinLeft = ADBackground.WinLeft+X;
         modInfoTextBox.WinTop = ADBackground.WinTop+Y;
 
-        modInfoText$= " v" $ class'MSPMut'.default.version $ "|";
+        modInfoText$= "||" $ versionMsg $ ": " $ class'MSPMut'.default.version;
         modInfoText$= "|" $ maxPerkMsg $ ":  " $ mspLRepInfo.minPerkLevel;
         modInfoText$= "|" $ minPerkMsg $ ":  " $ mspLRepInfo.maxPerkLevel;
         modInfoText$= "|" $ numPerksMsg $ ": " $ mspLRepInfo.veterancyTypes.Length;
@@ -290,7 +290,8 @@ defaultproperties {
     maxPerkMsg="Min perk level"
     minPerkMsg="Max perk level"
     numPerksMsg="Number of perks"
-    modInfoText="MinSP"
+    modInfoText="Minimalist Server Perks"
+    versionMsg= "Version"
     profilePage="MinSP.ProfilePage"
     OnPreDraw=InternalOnPreDraw
 
