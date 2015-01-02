@@ -5,7 +5,7 @@ perks.  The mutator can load any number of perks derived from the standard KF pe
 their own perk levels in additional to their perk class.
 
 ## Version
-1.0
+1.0.8
 
 ## Install
 Copy MinSP.u and MinSP.ucl to the 'system' folder in your Killing Floor directory.

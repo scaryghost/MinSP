@@ -183,8 +183,8 @@ defaultproperties {
     
     GroupName="KFMinSP"
     FriendlyName="Minimalist Server Perks"
-    Description="Minimalist environment for using custom perks.  Version 1.0"
-    version="1.0"
+    Description="Minimalist environment for using custom perks.  Version 1.0.8"
+    version="1.0.8"
 
     loginMenuClass="MinSP.InvasionLoginMenu"
     interactionClass="MinSP.MSPInteraction"
